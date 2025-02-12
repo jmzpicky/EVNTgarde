@@ -1,8 +1,13 @@
 import React from "react";
-import AccountPassword from "./Major Pages/AccountPassword";
+import "../App.css";
+import SignUp from "../Major Pages/SignUp";
 
 const App: React.FC = () => {
-  return <AccountPassword />;
+  return (
+    <div className="App">
+      <SignUp />
+    </div>
+  );
 };
 
 export default App;
