@@ -1,0 +1,118 @@
+.container {
+    max-width: 400px;
+    margin: auto;
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+  
+  h2 {
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #444;
+    text-align: left;
+  }
+  
+  input {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    width: 100%;
+  }
+  
+  button {
+    padding: 10px;
+    font-size: 16px;
+    color: white;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out;
+  }
+  
+  button:hover {
+    background-color: #0056b3;
+  }
+  
+  .signup-button {
+    background: none;
+    color: #007bff;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+  }
+  
+  .signup-button:hover {
+    text-decoration: underline;
+  }
+  
+  .checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 5px;
+  }
+  
+  .checkbox-container input {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+  }
+  
+  .checkbox-container label {
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+  }
+  
+  .oauthContainer {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .oauthButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out;
+    color: white;
+  }
+  
+  .googleButton {
+    background-color: #db4437;
+  }
+  
+  .googleButton:hover {
+    background-color: #c1351d;
+  }
+  
+  .yahooButton {
+    background-color: #400090;
+  }
+  
+  .yahooButton:hover {
+    background-color: #330072;
+  }

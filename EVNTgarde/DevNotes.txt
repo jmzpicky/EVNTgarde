@@ -3,3 +3,6 @@ npm i -- firebase dependencies
 npm i -g firebase-tools -- access to all firebase tools 
 
 //Sample Commitz
+
+//for backend in account management
+npm install react-router-dom
