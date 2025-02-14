@@ -11,8 +11,11 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.0.6",
+    "add": "^2.0.6",
+    "autoprefixer": "^10.4.20",
     "dependencies": "^0.0.1",
     "firebase": "^11.3.1",
+    "postcss-cli": "^11.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.1.5",

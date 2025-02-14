@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   auth,
   signInWithPopup,
@@ -8,11 +8,14 @@ import {
 import {
   signInWithEmailAndPassword,
   setPersistence,
+  signOut,
   browserLocalPersistence,
   browserSessionPersistence,
 } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import "./Login.css";
+
+const SESSION_DURATION = 30 * 24 * 60 * 60 * 1000; // 30 days in milliseconds
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -22,6 +25,24 @@ const Login: React.FC = () => {
   const [keepLoggedIn, setKeepLoggedIn] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    checkSessionExpiry();
+  }, []);
+
+  const checkSessionExpiry = () => {
+    const loginTimestamp = localStorage.getItem("loginTimestamp");
+    if (loginTimestamp) {
+      const elapsedTime = Date.now() - parseInt(loginTimestamp, 10);
+      if (elapsedTime > SESSION_DURATION) {
+        signOut(auth).then(() => {
+          localStorage.removeItem("loginTimestamp");
+          console.log("Session expired. User logged out.");
+          navigate("/login");
+        });
+      }
+    }
+  };
 
   const handleLogin = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -34,7 +55,12 @@ const Login: React.FC = () => {
         keepLoggedIn ? browserLocalPersistence : browserSessionPersistence
       );
       await signInWithEmailAndPassword(auth, email, password);
-      navigate("/dashboard"); // Redirect after login
+
+      if (keepLoggedIn) {
+        localStorage.setItem("loginTimestamp", Date.now().toString());
+      }
+
+      navigate("/home"); // Redirect after login
     } catch (error: any) {
       setError(error.message);
     } finally {
@@ -49,7 +75,12 @@ const Login: React.FC = () => {
         keepLoggedIn ? browserLocalPersistence : browserSessionPersistence
       );
       await signInWithPopup(auth, provider);
-      navigate("/dashboard");
+
+      if (keepLoggedIn) {
+        localStorage.setItem("loginTimestamp", Date.now().toString());
+      }
+
+      navigate("/home");
     } catch (error: any) {
       setError(error.message);
     }
