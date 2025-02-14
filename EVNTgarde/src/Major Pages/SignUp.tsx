@@ -6,6 +6,7 @@ import AccountPreferences from "./Sub Pages/AccountPreferences";
 import "./SignUp.css";
 import { auth, db } from "../firebase";
 import { collection, getDocs, query, where } from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
 import {
   OAuthProvider,
   GoogleAuthProvider,
@@ -43,15 +44,33 @@ const SignUp: React.FC = () => {
       setPasswordError("Passwords do not match.");
       return;
     }
-
+  
     try {
       setLoading(true);
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+  
+      // Prepare user data
+      const userData: Record<string, any> = {
+        userType,
         email,
-        password
-      );
-      console.log("User signed up:", userCredential.user);
+        phone,
+      };
+  
+      if (userType === "Customer") {
+        userData.firstName = firstName;
+        userData.lastName = lastName;
+      } else if (userType === "Organizer") {
+        userData.companyName = companyName;
+      } else if (userType === "Vendor") {
+        userData.businessName = businessName;
+        userData.businessType = businessType;
+      }
+  
+      // Save user data in Firestore using the user's UID
+      await setDoc(doc(db, "users", user.uid), userData);
+  
+      console.log("User data saved to Firestore:", userData);
       setSuccess(true);
     } catch (error: any) {
       setError(error.message);
@@ -59,7 +78,7 @@ const SignUp: React.FC = () => {
       setLoading(false);
     }
   };
-
+  
   const handleOAuthSignIn = async (
     provider: GoogleAuthProvider | OAuthProvider
   ) => {
