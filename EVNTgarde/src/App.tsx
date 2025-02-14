@@ -2,7 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./Major Pages/Login";
 import SignUp from "./Major Pages/SignUp";
-import Dashboard from "./Major Pages/Dashboard"; // Import Dashboard
+import Home from "./Major Pages/Home"; 
 
 const App: React.FC = () => {
   return (
@@ -11,8 +11,8 @@ const App: React.FC = () => {
         <Route path="/" element={<SignUp />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/dashboard" element={<Dashboard />} />{" "}
-        {/* Add Dashboard route */}
+        <Route path="/home" element={<Home />} />{" "}
+        {}
       </Routes>
     </Router>
   );
