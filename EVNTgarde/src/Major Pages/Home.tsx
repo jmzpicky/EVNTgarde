@@ -1,38 +1,70 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getAuth, onAuthStateChanged, User } from "firebase/auth";
-import { getFirestore, collection, query, where, getDocs } from "firebase/firestore";
+import {
+  getFirestore,
+  collection,
+  query,
+  where,
+  getDocs,
+  doc,
+  getDoc,
+} from "firebase/firestore";
 import Logout from "./Logout";
 import "./Home.css";
 
 const Home: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
+  const [role, setRole] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [location, setLocation] = useState("Mumbai");
+  const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const auth = getAuth();
-    onAuthStateChanged(auth, (currentUser) => {
+    const db = getFirestore();
+
+    onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
+      if (currentUser) {
+        const userRef = doc(db, "users", currentUser.uid);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+          setRole(userSnap.data().userType);
+        }
+      } else {
+        setRole(null);
+      }
     });
   }, []);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Example: Fetch events from Firestore based on search
     const db = getFirestore();
     const eventsRef = collection(db, "events");
-    const q = query(eventsRef, where("location", "==", location)); // Filter by location
-
+    const q = query(eventsRef, where("location", "==", location));
     const querySnapshot = await getDocs(q);
-    const results = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-
-    console.log("Search Results:", results); // Debugging
-
-    // Redirect to search results page (optional)
+    const results = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    console.log("Search Results:", results);
     navigate(`/search?query=${searchQuery}&location=${location}`);
+  };
+
+  const handleBookClick = (
+    event: React.MouseEvent<HTMLAnchorElement, MouseEvent>
+  ) => {
+    if (!user) {
+      event.preventDefault();
+      setShowModal(true);
+    }
+  };
+
+  const handleModalResponse = (hasAccount: boolean) => {
+    setShowModal(false);
+    navigate(hasAccount ? "/login" : "/signup");
   };
 
   return (
@@ -44,7 +76,9 @@ const Home: React.FC = () => {
             <>
               <Link to="/signup">Register</Link>
               <Link to="/login">Login</Link>
-              <Link to="/book">Book</Link>
+              <Link to="/book" onClick={handleBookClick}>
+                Book
+              </Link>
               <Link to="/about">Who We Are</Link>
             </>
           ) : (
@@ -57,6 +91,20 @@ const Home: React.FC = () => {
         </nav>
       </header>
 
+      {showModal && (
+        <div className="modal">
+          <div className="modal-content">
+            <p>
+              You need to have an account to book.
+              <br />
+              Do you already have an account?
+            </p>
+            <button onClick={() => handleModalResponse(true)}>Yes</button>
+            <button onClick={() => handleModalResponse(false)}>No</button>
+          </div>
+        </div>
+      )}
+
       {/* Search Bar Section */}
       <div className="search-bar">
         <form onSubmit={handleSearch}>
@@ -66,7 +114,10 @@ const Home: React.FC = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
-          <select value={location} onChange={(e) => setLocation(e.target.value)}>
+          <select
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+          >
             <option value="Mumbai">Mumbai</option>
             <option value="Delhi">Delhi</option>
             <option value="Bangalore">Bangalore</option>
@@ -74,6 +125,29 @@ const Home: React.FC = () => {
           <button type="submit">Search</button>
         </form>
       </div>
+
+      {user && role && (
+        <aside className="sidebar">
+          <h2>{role} Dashboard</h2>
+          <ul>
+            <li>
+              <Link to="/dashboard">Home</Link>
+            </li>
+            <li>
+              <Link to="/bookings">Bookings</Link>
+            </li>
+            <li>
+              <Link to="/reviews">Reviews</Link>
+            </li>
+            <li>
+              <Link to="/settings">Settings</Link>
+            </li>
+            <li>
+              <Logout />
+            </li>
+          </ul>
+        </aside>
+      )}
 
       <footer>
         <p>© 2025 EVNTgarde. All rights reserved.</p>
