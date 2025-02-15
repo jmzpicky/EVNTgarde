@@ -1,31 +1,39 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { getAuth, onAuthStateChanged, User } from "firebase/auth";
-import { getFirestore, doc, getDoc } from "firebase/firestore";
+import { getFirestore, collection, query, where, getDocs } from "firebase/firestore";
 import Logout from "./Logout";
 import "./Home.css";
 
 const Home: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
-  const [role, setRole] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [location, setLocation] = useState("Mumbai");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const auth = getAuth();
-    const db = getFirestore();
-
-    onAuthStateChanged(auth, async (currentUser) => {
+    onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
-      if (currentUser) {
-        const userRef = doc(db, "users", currentUser.uid);
-        const userSnap = await getDoc(userRef);
-        if (userSnap.exists()) {
-          setRole(userSnap.data().userType); 
-        }
-      } else {
-        setRole(null);
-      }
     });
   }, []);
+
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // Example: Fetch events from Firestore based on search
+    const db = getFirestore();
+    const eventsRef = collection(db, "events");
+    const q = query(eventsRef, where("location", "==", location)); // Filter by location
+
+    const querySnapshot = await getDocs(q);
+    const results = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+
+    console.log("Search Results:", results); // Debugging
+
+    // Redirect to search results page (optional)
+    navigate(`/search?query=${searchQuery}&location=${location}`);
+  };
 
   return (
     <div className="home-container">
@@ -33,7 +41,6 @@ const Home: React.FC = () => {
         <h1>Welcome to EVNTgarde</h1>
         <nav>
           {!user ? (
-            // 🔹 Logged-out view (No roles yet)
             <>
               <Link to="/signup">Register</Link>
               <Link to="/login">Login</Link>
@@ -41,7 +48,6 @@ const Home: React.FC = () => {
               <Link to="/about">Who We Are</Link>
             </>
           ) : (
-            // 🔹 Logged-in view (With roles)
             <>
               <Link to="/book">Book</Link>
               <Link to="/about">Who We Are</Link>
@@ -51,18 +57,23 @@ const Home: React.FC = () => {
         </nav>
       </header>
 
-      {user && role && (
-        <aside className="sidebar">
-          <h2>{role} Dashboard</h2>
-          <ul>
-            <li><Link to="/dashboard">Home</Link></li>
-            <li><Link to="/bookings">Bookings</Link></li>
-            <li><Link to="/reviews">Reviews</Link></li>
-            <li><Link to="/settings">Settings</Link></li>
-            <li><Logout /></li>
-          </ul>
-        </aside>
-      )}
+      {/* Search Bar Section */}
+      <div className="search-bar">
+        <form onSubmit={handleSearch}>
+          <input
+            type="text"
+            placeholder="Search Events, Categories, Location..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <select value={location} onChange={(e) => setLocation(e.target.value)}>
+            <option value="Mumbai">Mumbai</option>
+            <option value="Delhi">Delhi</option>
+            <option value="Bangalore">Bangalore</option>
+          </select>
+          <button type="submit">Search</button>
+        </form>
+      </div>
 
       <footer>
         <p>© 2025 EVNTgarde. All rights reserved.</p>
