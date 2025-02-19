@@ -19,6 +19,9 @@ const Home: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [location, setLocation] = useState("Mumbai");
   const [showModal, setShowModal] = useState(false);
+  const [darkMode, setDarkMode] = useState(
+    localStorage.getItem("theme") === "dark"
+  );
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -38,6 +41,13 @@ const Home: React.FC = () => {
       }
     });
   }, []);
+
+  useEffect(() => {
+    document.body.classList.toggle("dark-mode", darkMode);
+    localStorage.setItem("theme", darkMode ? "dark" : "light");
+  }, [darkMode]);
+
+  const toggleTheme = () => setDarkMode(!darkMode);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,7 +78,7 @@ const Home: React.FC = () => {
   };
 
   return (
-    <div className="home-container">
+    <div className={`home-container ${darkMode ? "dark" : "light"}`}>
       <header>
         <h1>Welcome to EVNTgarde</h1>
         <nav>
@@ -105,7 +115,6 @@ const Home: React.FC = () => {
         </div>
       )}
 
-      {/* Search Bar Section */}
       <div className="search-bar">
         <form onSubmit={handleSearch}>
           <input
@@ -151,6 +160,9 @@ const Home: React.FC = () => {
 
       <footer>
         <p>© 2025 EVNTgarde. All rights reserved.</p>
+        <button className="theme-toggle" onClick={toggleTheme}>
+          {darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+        </button>
       </footer>
     </div>
   );
