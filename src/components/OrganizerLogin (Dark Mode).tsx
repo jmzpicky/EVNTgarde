@@ -9,7 +9,7 @@ const LoginDark: React.FC = () => {
     const [showPassword, setShowPassword] = useState(false);
     return (
         <div className="flex h-screen items-center justify-center bg-gray-300 font-[Poppins]">
-            <div className="flex w-[1440px] h-[650px] bg-blue-600 rounded-xl shadow-lg overflow-hidden">
+            <div className="flex w-[1440px] h-[650px] bg-blue-600 rounded-xl shadow-lg overflow-hidden font-[Poppins]">
 
         <div className="w-2/5 bg-blue-600 text-white flex flex-col items-center justify-center text-center p-8">
         <img src={Logo} className="w-52 mb-6" alt="Logo" />
